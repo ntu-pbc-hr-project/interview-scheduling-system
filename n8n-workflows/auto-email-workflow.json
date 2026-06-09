@@ -1,0 +1,207 @@
+{
+  "name": "自動化寄信工作流",
+  "description": "每小時檢查試算表，根據篩選結果自動寄送面試邀約信或感謝信",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1p-91-oJLvN-AIjugluXBKwyE5V2ZNk6TzfcuoTtzO78",
+          "mode": "list",
+          "cachedResultName": "HR資料_計算社會學 正本",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1p-91-oJLvN-AIjugluXBKwyE5V2ZNk6TzfcuoTtzO78/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1879048326,
+          "mode": "list",
+          "cachedResultName": "track_sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1p-91-oJLvN-AIjugluXBKwyE5V2ZNk6TzfcuoTtzO78/edit#gid=1879048326"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [208, 0],
+      "id": "33d05463-aef3-47cb-b631-4c33c8eaeeab",
+      "name": "讀取篩選結果",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "tyqd9bPJ8EJMQ384",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.qualification }}",
+                    "rightValue": "通過",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "deebfb5e-1df5-4c24-9a78-287dab4c9e86"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "7ea715d2-99b4-401e-b3c2-47daf204ad79",
+                    "leftValue": "={{ $json.qualification }}",
+                    "rightValue": "不通過",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [416, 0],
+      "id": "85152650-7cbb-445d-ac27-0e9a0db245d9",
+      "name": "依照是否錄取寄送信件"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('讀取篩選結果').item.json.email }}",
+        "subject": "=恭喜您通過-第一階段書審 - 請填寫面試意願時間",
+        "message": "=<div style=\"max-width: 600px; margin: 0 auto; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333333; line-height: 1.6; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);\"><div style=\"background-color: #4A90E2; padding: 30px 20px; text-align: center;\"><h1 style=\"color: #ffffff; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: 1px;\">面試邀請通知</h1></div><div style=\"padding: 30px 40px; background-color: #ffffff;\"><p style=\"font-size: 16px; margin-top: 0;\">親愛的 <strong>{{ $json.name }}</strong> 您好：</p><p style=\"font-size: 15px;\">感謝您應徵我們團隊的「<strong>{{ $json.job_applied }}</strong>」職缺。</p><p style=\"font-size: 15px;\">很高興通知您，您的簡歷已通過我們的第一階段書審評估！為了進一步瞭解您的專業背景與契合度，我們誠摯邀請您參與下一階段的面試。</p><p style=\"font-size: 15px; color: #666666;\">請您於 <strong>3 日內</strong> 點擊下方按鈕，並於系統中選取您可以配合的面試時間，以便我們為您與面試主管安排行程：</p><div style=\"text-align: center; margin: 35px 0;\"><a href=\"http://localhost:8501/?name={{ $json.name }}&email={{ $json.email }}\" style=\"background-color: #4A90E2; color: #ffffff; padding: 14px 35px; font-size: 16px; font-weight: bold; text-decoration: none; border-radius: 25px; display: inline-block; box-shadow: 0 3px 6px rgba(74,144,226,0.3); transition: all 0.2s ease;\">👉 點此線上預約面試時間</a></div><hr style=\"border: 0; border-top: 1px solid #eeeeee; margin: 30px 0;\"><p style=\"font-size: 14px; color: #999999; margin-bottom: 0;\">若對上述內容有任何疑問，歡迎直接回信與我們聯繫。<br>祝 順心</p></div><div style=\"background-color: #f9f9f9; padding: 15px; text-align: center; font-size: 12px; color: #aaaaaa; border-top: 1px solid #eeeeee;\">© 招募團隊 敬上</div></div>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [624, -80],
+      "id": "33f0771d-5976-4b65-a35a-5474a44af774",
+      "name": "寄送面試邀約信",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dE3n2pNq7bZg5kQU",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "=【應徵結果】感謝您應徵 {{ $json.job_applied }} 職缺及對我們團隊的支持",
+        "message": "=<div style=\"max-width: 600px; margin: 0 auto; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333333; line-height: 1.6; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);\"><div style=\"background-color: #7F8C8D; padding: 30px 20px; text-align: center;\"><h1 style=\"color: #ffffff; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: 1px;\">應徵結果通知</h1></div><div style=\"padding: 30px 40px; background-color: #ffffff;\"><p style=\"font-size: 16px; margin-top: 0;\">親愛的 <strong>{{ $json.name }}</strong> 您好：</p><p style=\"font-size: 15px;\">感謝您先前應徵我們團隊的「<strong>{{ $json.job_applied }}</strong>」職缺，並撥冗參與我們的招募流程。</p><p style=\"font-size: 15px;\">在本次招募中，我們收到了許多優秀人才的履歷。經過招募團隊與主管的謹慎評估與討論，雖然您的學經歷十分優秀，但遺憾的是，目前的職缺需求與您的專長方向未能完全契合，因此本次無法邀請您參與下一階段的面試。</p><p style=\"font-size: 15px; color: #666666;\">您的履歷已安全存入我們的人才庫中。未來若有更適合您專長的相關職缺釋出，我們將會優先與您聯繫。</p><p style=\"font-size: 15px;\">再次感謝您對我們團隊的關注與支持，竭誠祝願您在未來的職涯發展中一切順利、展翅高飛。</p><hr style=\"border: 0; border-top: 1px solid #eeeeee; margin: 30px 0;\"><p style=\"font-size: 14px; color: #999999; margin-bottom: 0;\">祝 順心</p></div><div style=\"background-color: #f9f9f9; padding: 15px; text-align: center; font-size: 12px; color: #aaaaaa; border-top: 1px solid #eeeeee;\">© 招募團隊 敬上</div></div>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [624, 96],
+      "id": "22748fa6-5612-4847-af8c-440867964952",
+      "name": "寄送感謝信",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dE3n2pNq7bZg5kQU",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [0, 0],
+      "id": "dbdbe1d3-1994-4483-8c28-d10cd55d4510",
+      "name": "每小時寄送一次面試邀請信"
+    }
+  ],
+  "connections": {
+    "讀取篩選結果": {
+      "main": [
+        [
+          {
+            "node": "依照是否錄取寄送信件",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "依照是否錄取寄送信件": {
+      "main": [
+        [
+          {
+            "node": "寄送面試邀約信",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "寄送感謝信",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "寄送面試邀約信": {
+      "main": [
+        []
+      ]
+    },
+    "寄送感謝信": {
+      "main": [
+        []
+      ]
+    },
+    "每小時寄送一次面試邀請信": {
+      "main": [
+        [
+          {
+            "node": "讀取篩選結果",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

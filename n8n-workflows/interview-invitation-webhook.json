@@ -1,0 +1,183 @@
+{
+  "name": "自動化面試邀請工作流",
+  "description": "前端預約成功後，自動寄送面試時間與 Google Meet 連結給應徵者和面試主管",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "interview-booked",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 0],
+      "id": "85dac694-7f46-40bc-ac35-f09848dd47da",
+      "name": "注意前端網頁填寫狀況"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.body.candidate_email }}",
+        "subject": "【面試通知】您已成功預約面試時段",
+        "message": "=<div style=\"max-width: 600px; margin: 0 auto; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333333; line-height: 1.6; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);\"><div style=\"background-color: #4A90E2; padding: 30px 20px; text-align: center;\"><h1 style=\"color: #ffffff; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: 1px;\">面試行程確認通知</h1></div><div style=\"padding: 30px 40px; background-color: #ffffff;\"><p style=\"font-size: 16px; margin-top: 0;\">親愛的 <strong>{{ $json.body.candidate_name }}</strong> 您好：</p><p style=\"font-size: 15px;\">我們已收到您在系統中送出的面試時間預約。招募主管與人資團隊的時間已為您同步保留，以下為您的第一階段面試詳細資訊：</p><div style=\"background-color: #f8fafc; border-left: 4px solid #4A90E2; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0;\"><p style=\"margin: 0 0 10px 0; font-size: 15px;\"><strong>📅 面試日期：</strong>{{ $json.body.interview_date }}</p><p style=\"margin: 0; font-size: 15px;\"><strong>⏰ 面試時段：</strong>{{ $json.body.interview_time }}</p></div><p style=\"font-size: 15px;\">本場次面試將以<strong>線上視訊</strong>形式進行，請您在面試時間前 5 分鐘，點擊下方按鈕進入線上視訊會議室：</p><div style=\"text-align: center; margin: 35px 0;\"><a href=\"{{ $json.body.google_meet_url }}\" style=\"background-color: #1e8e3e; color: #ffffff; padding: 14px 35px; font-size: 16px; font-weight: bold; text-decoration: none; border-radius: 25px; display: inline-block; box-shadow: 0 3px 6px rgba(30,142,62,0.3); transition: all 0.2s ease;\">📹 點此進入 Google Meet 線上視訊</a><p style=\"margin: 10px 0 0 0; font-size: 12px; color: #888888;\">若按鈕無法點擊，可複製此連結：{{ $json.body.google_meet_url }}</p></div><hr style=\"border: 0; border-top: 1px solid #eeeeee; margin: 30px 0;\"><p style=\"font-size: 14px; color: #999999; margin-bottom: 0;\"><strong>注意事項：</strong><br>1. 請確保您處於網路訊號良好且安靜、無干擾的環境。<br>2. 建議提前測試您的視訊鏡頭與麥克風設備是否運作正常。<br>3. 若行程有臨時變動，請儘速回信或撥打人資專線與我們聯繫。<br><br>祝您面試順利！<br>招募團隊 敬上</p></div><div style=\"background-color: #f9f9f9; padding: 15px; text-align: center; font-size: 12px; color: #aaaaaa; border-top: 1px solid #eeeeee;\">© 招募團隊 敬上</div></div>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [208, 0],
+      "id": "b42fde89-95e7-4c99-9372-0a2d263d4724",
+      "name": "寄送面試時間跟連結給受試者",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dE3n2pNq7bZg5kQU",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.interviewer_email }}",
+        "subject": "=【面試通知】您有一場新安排的面試",
+        "message": "=<div style=\"max-width: 600px; margin: 0 auto; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333333; line-height: 1.6; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);\"><div style=\"background-color: #E67E22; padding: 25px 20px; text-align: center;\"><h1 style=\"color: #ffffff; margin: 0; font-size: 22px; font-weight: 600; letter-spacing: 1px;\">📅 新增面試行程通知 (主管內部信)</h1></div><div style=\"padding: 30px 40px; background-color: #ffffff;\"><p style=\"font-size: 16px; margin-top: 0;\">Hi 主管 您好：</p><p style=\"font-size: 15px;\">系統已為您與人資團隊自動排定一場新的應聘者面試，詳細資訊如下：</p><table style=\"width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 15px;\"><tr style=\"background-color: #f8fafc;\"><td style=\"padding: 12px; border: 1px solid #e2e8f0; font-weight: bold; width: 30%;\">👤 應聘者姓名</td><td style=\"padding: 12px; border: 1px solid #e2e8f0;\">{{ $json.name }}</td></tr><tr><td style=\"padding: 12px; border: 1px solid #e2e8f0; font-weight: bold;\">💼 應徵職缺</td><td style=\"padding: 12px; border: 1px solid #e2e8f0;\">{{ $json.job_applied }}</td></tr><tr style=\"background-color: #f8fafc;\"><td style=\"padding: 12px; border: 1px solid #e2e8f0; font-weight: bold;\">📬 聯絡信箱</td><td style=\"padding: 12px; border: 1px solid #e2e8f0;\">{{ $json.email }}</td></tr></table><div style=\"background-color: #fffaf0; border-left: 4px solid #E67E22; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0;\"><p style=\"margin: 0 0 10px 0; font-size: 15px; color: #C0392B;\"><strong>📅 面試日期：</strong>{{ $json.interview_at }}</p></div><p style=\"font-size: 15px;\">此行程已自動同步至 Google 日曆。面試當天請點擊下方綠色按鈕直接開啟視訊連結進入會議室：</p><div style=\"text-align: center; margin: 35px 0;\"><a href=\"{{ $json.meeting_link }}\" style=\"background-color: #1e8e3e; color: #ffffff; padding: 14px 35px; font-size: 16px; font-weight: bold; text-decoration: none; border-radius: 25px; display: inline-block; box-shadow: 0 3px 6px rgba(30,142,62,0.3); transition: all 0.2s ease;\">📹 進入 Google Meet 視訊會議室</a></div><hr style=\"border: 0; border-top: 1px solid #eeeeee; margin: 30px 0;\"><p style=\"font-size: 13px; color: #999999; margin-bottom: 0;\">💡 <strong>人資溫馨提示：</strong><br>您可以隨時登入人資主表格查看該候選人的 AI 履歷評分與詳細摘要報告。<br>* 本信件為系統自動發送，請勿直接回覆。</p></div><div style=\"background-color: #f9f9f9; padding: 15px; text-align: center; font-size: 12px; color: #aaaaaa; border-top: 1px solid #eeeeee;\">© 企業招募自動化管理系統</div></div>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [448, 160],
+      "id": "a29e9d5a-29b6-4f48-8218-58267b77d501",
+      "name": "寄送面試時間跟連結給考官",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dE3n2pNq7bZg5kQU",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1p-91-oJLvN-AIjugluXBKwyE5V2ZNk6TzfcuoTtzO78",
+          "mode": "list",
+          "cachedResultName": "HR資料_計算社會學 正本",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1p-91-oJLvN-AIjugluXBKwyE5V2ZNk6TzfcuoTtzO78/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1879048326,
+          "mode": "list",
+          "cachedResultName": "track_sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1p-91-oJLvN-AIjugluXBKwyE5V2ZNk6TzfcuoTtzO78/edit#gid=1879048326"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "email",
+              "lookupValue": "={{ $json.body.candidate_email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [208, 160],
+      "id": "753008a9-d509-4d01-a92d-dfb483d06647",
+      "name": "讀取考官資料",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "tyqd9bPJ8EJMQ384",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1p-91-oJLvN-AIjugluXBKwyE5V2ZNk6TzfcuoTtzO78",
+          "mode": "list",
+          "cachedResultName": "HR資料_計算社會學 正本",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1p-91-oJLvN-AIjugluXBKwyE5V2ZNk6TzfcuoTtzO78/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1879048326,
+          "mode": "list",
+          "cachedResultName": "track_sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1p-91-oJLvN-AIjugluXBKwyE5V2ZNk6TzfcuoTtzO78/edit#gid=1879048326"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "interview_at": "={{ $('注意前端網頁填寫狀況').item.json.body.interview_date }}  {{ $('注意前端網頁填寫狀況').item.json.body.interview_time }}",
+            "meeting_link": "={{ $('注意前端網頁填寫狀況').item.json.body.google_meet_url }}",
+            "email": "={{ $('注意前端網頁填寫狀況').item.json.body.candidate_email }}",
+            "action_at": "={{ $now.format('yyyy-MM-dd HH:mm:ss') }}"
+          },
+          "matchingColumns": ["email"],
+          "schema": []
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [448, 0],
+      "id": "62dfa7c1-f5ad-4cb4-90ee-01b4e8d0ca3d",
+      "name": "更新連結寄出狀態",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "tyqd9bPJ8EJMQ384",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "注意前端網頁填寫狀況": {
+      "main": [
+        [
+          {
+            "node": "讀取考官資料",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "寄送面試時間跟連結給受試者",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "寄送面試時間跟連結給受試者": {
+      "main": [
+        [
+          {
+            "node": "更新連結寄出狀態",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "讀取考官資料": {
+      "main": [
+        [
+          {
+            "node": "寄送面試時間跟連結給考官",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}
